@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Home - E-Thesis Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card search-card">
+            <div class="card-body">
+                <h5 class="card-title text-center mb-4">
+                    <i class="fas fa-search"></i> Search Thesis Collection (2015-2025)
+                </h5>
+                <form method="GET" action="{{ url_for('index') }}">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control form-control-lg" name="search"
+                                   placeholder="Search by title, author, keyword, or abstract..."
+                                   value="{{ search_query }}">
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select form-select-lg" name="year">
+                                <option value="">All Years</option>
+                                {% for year_row in years %}
+                                <option value="{{ year_row.year }}" {% if year_filter == year_row.year|string %}selected{% endif %}>
+                                    {{ year_row.year }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="decorative-line"></div>
+
+<div class="row mb-3">
+    <div class="col-md-12 text-center">
+        <h3 class="mb-3">
+            <i class="fas fa-book-open"></i> Available Theses
+        </h3>
+        <span class="badge bg-primary" style="font-size: 1.2rem; padding: 10px 20px;">
+            {{ theses|length }} thesis(es) available
+        </span>
+    </div>
+</div>
+
+{% if theses %}
+<div class="row mt-4">
+    {% for thesis in theses %}
+    <div class="col-md-6 col-lg-4 thesis-card">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-light text-primary">{{ thesis.year }}</span>
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title text-primary">{{ thesis.title|safe }}</h5>
+                <h6 class="card-subtitle mb-3 text-muted">
+                    <i class="fas fa-user"></i> {{ thesis.authors }}
+                </h6>
+                <p class="card-text mb-2">
+                    <small><strong><i class="fas fa-user-tie"></i> Adviser:</strong> {{ thesis.adviser }}</small>
+                </p>
+                <div class="decorative-line" style="margin: 10px 0;"></div>
+                <p class="card-text">
+                    <small class="text-muted">
+                        {{ thesis.abstract[:150]|striptags }}{% if thesis.abstract|length > 150 %}...{% endif %}
+                    </small>
+                </p>
+                <div class="d-grid gap-2 mt-3">
+                    <a href="{{ url_for('view_thesis', thesis_id=thesis.id) }}"
+                       class="btn btn-primary btn-sm">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+                    {% if thesis.pdf_filename %}
+                    <a href="{{ url_for('download_thesis', thesis_id=thesis.id) }}"
+                       class="btn btn-success btn-sm">
+                        <i class="fas fa-download"></i> Download PDF
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <small class="text-muted">
+                    <i class="fas fa-tags"></i> {{ thesis.keywords|safe }}
+                </small>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="alert alert-info text-center" style="padding: 40px;">
+            <i class="fas fa-info-circle fa-3x mb-3"></i>
+            <h4>No theses found</h4>
+            <p class="mb-0">
+                {% if search_query or year_filter %}
+                    Try adjusting your search criteria or clear filters to see all theses.
+                {% else %}
+                    Please check back later or contact the administrator.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

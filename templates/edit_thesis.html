@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Thesis - E-Thesis Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-12">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0"><i class="fas fa-edit"></i> Edit Thesis</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('edit_thesis', thesis_id=thesis.id) }}"
+                      enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="title" class="form-label">
+                                <i class="fas fa-heading"></i> Title <span class="text-danger">*</span>
+                            </label>
+                            <div id="title-toolbar" class="formatting-toolbar mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatTitle('bold')" title="Bold">
+                                    <i class="fas fa-bold"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatTitle('italic')" title="Italic">
+                                    <i class="fas fa-italic"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatTitle('underline')" title="Underline">
+                                    <i class="fas fa-underline"></i>
+                                </button>
+                            </div>
+                            <div id="title-editor" contenteditable="true" class="form-control" style="min-height: 60px;">{{ thesis.title|safe }}</div>
+                            <input type="hidden" id="title" name="title" value="{{ thesis.title }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label for="authors" class="form-label">
+                                <i class="fas fa-users"></i> Author(s) <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="authors" name="authors"
+                                   value="{{ thesis.authors }}" required>
+                            <small class="text-muted">Separate multiple authors with commas</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="year" class="form-label">
+                                <i class="fas fa-calendar"></i> Year <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="year" name="year" required>
+                                {% for year in range(2025, 2014, -1) %}
+                                <option value="{{ year }}" {% if thesis.year == year %}selected{% endif %}>
+                                    {{ year }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="adviser" class="form-label">
+                                <i class="fas fa-user-tie"></i> Adviser <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="adviser" name="adviser"
+                                   value="{{ thesis.adviser }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="abstract" class="form-label">
+                                <i class="fas fa-align-left"></i> Abstract <span class="text-danger">*</span>
+                            </label>
+                            <div id="abstract-toolbar" class="formatting-toolbar mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatAbstract('bold')" title="Bold">
+                                    <i class="fas fa-bold"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatAbstract('italic')" title="Italic">
+                                    <i class="fas fa-italic"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatAbstract('underline')" title="Underline">
+                                    <i class="fas fa-underline"></i>
+                                </button>
+                            </div>
+                            <div id="abstract-editor" contenteditable="true" class="form-control" style="min-height: 200px;">{{ thesis.abstract|safe }}</div>
+                            <input type="hidden" id="abstract" name="abstract" value="{{ thesis.abstract }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="keywords" class="form-label">
+                                <i class="fas fa-tags"></i> Keywords <span class="text-danger">*</span>
+                            </label>
+                            <div id="keywords-toolbar" class="formatting-toolbar mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatKeywords('bold')" title="Bold">
+                                    <i class="fas fa-bold"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatKeywords('italic')" title="Italic">
+                                    <i class="fas fa-italic"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatKeywords('underline')" title="Underline">
+                                    <i class="fas fa-underline"></i>
+                                </button>
+                            </div>
+                            <div id="keywords-editor" contenteditable="true" class="form-control" style="min-height: 60px;">{{ thesis.keywords|safe }}</div>
+                            <input type="hidden" id="keywords" name="keywords" value="{{ thesis.keywords }}" required>
+                            <small class="text-muted">Separate keywords with commas</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-4">
+                            <label for="pdf_file" class="form-label">
+                                <i class="fas fa-file-pdf"></i> PDF File
+                            </label>
+                            {% if thesis.pdf_filename %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i> Current file:
+                                <strong>{{ thesis.pdf_filename }}</strong>
+                                <br>
+                                <small>Upload a new file to replace it, or leave empty to keep the current file.</small>
+                            </div>
+                            {% endif %}
+                            <input type="file" class="form-control" id="pdf_file"
+                                   name="pdf_file" accept=".pdf">
+                            <small class="text-muted">Maximum file size: 16MB</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Update Thesis
+                            </button>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Format functions for contenteditable divs
+    function formatTitle(command) {
+        document.execCommand(command, false, null);
+        document.getElementById('title-editor').focus();
+    }
+
+    function formatAbstract(command) {
+        document.execCommand(command, false, null);
+        document.getElementById('abstract-editor').focus();
+    }
+
+    function formatKeywords(command) {
+        document.execCommand(command, false, null);
+        document.getElementById('keywords-editor').focus();
+    }
+
+    // Form submission - transfer contenteditable content to hidden inputs
+    document.querySelector('form').addEventListener('submit', function(e) {
+        document.getElementById('title').value = document.getElementById('title-editor').innerHTML;
+        document.getElementById('abstract').value = document.getElementById('abstract-editor').innerHTML;
+        document.getElementById('keywords').value = document.getElementById('keywords-editor').innerHTML;
+
+        // Validate
+        if (!document.getElementById('title-editor').textContent.trim()) {
+            e.preventDefault();
+            alert('Please enter a title');
+            return false;
+        }
+        if (!document.getElementById('abstract-editor').textContent.trim()) {
+            e.preventDefault();
+            alert('Please enter an abstract');
+            return false;
+        }
+        if (!document.getElementById('keywords-editor').textContent.trim()) {
+            e.preventDefault();
+            alert('Please enter keywords');
+            return false;
+        }
+    });
+</script>
+{% endblock %}

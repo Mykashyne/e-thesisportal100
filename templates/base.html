@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}E-Thesis Portal{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: normal;
+            padding-top: 90px;
+            background: linear-gradient(to bottom, #f0f8ff 0%, #e6f3ff 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            background: linear-gradient(135deg, #0078d4 0%, #50a0d8 100%) !important;
+            box-shadow: 0 3px 15px rgba(0,120,212,0.3);
+            padding: 15px 0;
+        }
+        .navbar-brand {
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: white !important;
+            letter-spacing: -1px;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .logo-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-right {
+            display: flex;
+            align-items: center;
+        }
+        .logo-img {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            background: transparent;
+            padding: 8px;
+            border-radius: 10px;
+            box-shadow: none;
+        }
+        .brand-text {
+            font-family: Arial Black, Arial, sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: -2px;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, rgba(0, 120, 212, 0.4) 0%, rgba(80, 160, 216, 0.4) 50%, rgba(168, 216, 255, 0.3) 100%),
+                        url("{{ url_for('static', filename='images/fish-background.png') }}") center/cover !important;
+            color: white;
+            padding: 80px 0 60px 0;
+            margin-bottom: 40px;
+            border-radius: 0 0 25px 25px;
+            box-shadow: 0 5px 20px rgba(0,120,212,0.3);
+            position: relative;
+            overflow: hidden;
+            min-height: 500px;
+        }
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 120, 212, 0.2);
+            z-index: 0;
+        }
+        .page-header::after {
+            content: '';
+            display: none;
+        }
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        .header-logos-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 0;
+        }
+        .header-logo-left,
+        .header-logo-right {
+            width: 220px;
+            height: 220px;
+            object-fit: contain;
+            background: transparent;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: none;
+            position: absolute;
+        }
+        .header-logo-left {
+            left: 30px;
+            top: -20px;
+        }
+        .header-logo-right {
+            right: 30px;
+            top: -20px;
+        }
+        .header-title-main {
+            font-family: Arial Black, Arial, sans-serif;
+            font-weight: 900;
+            color: #ffffff;
+            font-size: 5rem;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            letter-spacing: -3px;
+            margin: 80px 0 20px 0;
+            position: relative;
+            z-index: 2;
+        }
+        .header-title {
+            font-family: 'Times New Roman', Times, serif;
+            font-weight: bold;
+            color: #ffffff;
+            font-size: 2rem;
+        }
+
+        /* Decorative Elements */
+        .decorative-line {
+            height: 4px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
+            margin: 25px auto;
+            max-width: 400px;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            box-shadow: 0 3px 10px rgba(0,120,212,0.15);
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: white;
+            border-radius: 12px;
+            border-left: 4px solid #0078d4;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,120,212,0.25);
+        }
+        .search-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,120,212,0.15);
+            border-left: 6px solid #0078d4;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #0078d4 0%, #50a0d8 100%) !important;
+            border: none !important;
+            font-weight: bold;
+            box-shadow: 0 3px 8px rgba(0,120,212,0.3);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #006cbd 0%, #4090c8 100%) !important;
+            box-shadow: 0 5px 12px rgba(0,120,212,0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Badges */
+        .badge-year {
+            background: linear-gradient(135deg, #0078d4 0%, #50a0d8 100%) !important;
+            box-shadow: 0 2px 6px rgba(0,120,212,0.3);
+            font-size: 0.9rem;
+            padding: 8px 15px;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #0078d4 0%, #50a0d8 100%) !important;
+            color: white;
+            padding: 35px 0;
+            margin-top: 60px;
+            box-shadow: 0 -5px 20px rgba(0,120,212,0.3);
+        }
+        .footer-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .footer-logo {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            background: transparent;
+            padding: 8px;
+            border-radius: 10px;
+            box-shadow: none;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .card-title {
+        color: #000000 !important;
+        font-weight: bold;
+        }
+        .card-title a {
+         color: #000000 !important;
+         text-decoration: none;
+        }
+        .card-title a:hover {
+        color: #333333 !important;
+        text-decoration: underline;
+        }
+        label, input, textarea, select, button {
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        /* Card Headers */
+        .card-header.bg-primary {
+            background: linear-gradient(135deg, #0078d4 0%, #50a0d8 100%) !important;
+        }
+
+        /* Alert Colors */
+        .alert-info {
+            background-color: #e6f3ff;
+            border-color: #50a0d8;
+            color: #000000;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-logo-left,
+            .header-logo-right {
+                width: 100px;
+                height: 100px;
+                padding: 12px;
+            }
+            .header-logo-left {
+                left: 10px;
+                top: -10px;
+            }
+            .header-logo-right {
+                right: 10px;
+                top: -10px;
+            }
+            .logo-img {
+                width: 45px;
+                height: 45px;
+            }
+            .header-title-main {
+                font-size: 2.5rem;
+                letter-spacing: -2px;
+                margin-top: 60px;
+            }
+            .brand-text {
+                font-size: 1.3rem;
+            }
+            .page-header {
+                min-height: 400px;
+                padding: 60px 0 40px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <div class="logo-container">
+                <div class="logo-left">
+                    <!-- Fisheries Logo - LEFT -->
+                    <img src="{{ url_for('static', filename='images/fisheries-logo.png') }}"
+                         alt="Fisheries"
+                         class="logo-img"
+                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%2250%22 font-size=%2250%22%3E🐟%3C/text%3E%3C/svg%3E'">
+                    <span class="brand-text">e-Thesis Portal</span>
+                </div>
+                <div class="logo-right d-none d-md-block">
+                    <!-- BU Logo - RIGHT -->
+                    <img src="{{ url_for('static', filename='images/bu-logo.png') }}"
+                         alt="BU"
+                         class="logo-img"
+                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%2250%22 font-size=%2240%22%3E🎓%3C/text%3E%3C/svg%3E'">
+                </div>
+            </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('add_thesis') }}">
+                            <i class="fas fa-plus"></i> Add Thesis
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-sign-in-alt"></i> Admin Login
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container text-center header-content">
+            <div class="header-logos-container">
+                <!-- Fisheries Logo - LEFT -->
+                <img src="{{ url_for('static', filename='images/fisheries-logo.png') }}"
+                     alt="Fisheries Department"
+                     class="header-logo-left"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%2250%22 font-size=%2260%22%3E🐟%3C/text%3E%3C/svg%3E'">
+
+                <!-- BU Logo - RIGHT -->
+                <img src="{{ url_for('static', filename='images/bu-logo.png') }}"
+                     alt="Bicol University"
+                     class="header-logo-right"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%2250%22 font-size=%2250%22%3E🎓%3C/text%3E%3C/svg%3E'">
+            </div>
+
+            <h1 class="header-title-main">e-Thesis Portal</h1>
+            <div class="decorative-line"></div>
+            <p class="header-title mb-2">Bicol University Tabaco – Fisheries Department</p>
+            <p class="mb-0"><small>Digital Repository of Fisheries Research (2015-2025)</small></p>
+        </div>
+    </div>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer mt-5">
+        <div class="container text-center">
+            <div class="footer-logos">
+                <img src="{{ url_for('static', filename='images/fisheries-logo.png') }}"
+                     alt="Fisheries"
+                     class="footer-logo"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%2250%22 font-size=%2250%22%3E🐟%3C/text%3E%3C/svg%3E'">
+                <img src="{{ url_for('static', filename='images/bu-logo.png') }}"
+                     alt="BU"
+                     class="footer-logo"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%2250%22 font-size=%2240%22%3E🎓%3C/text%3E%3C/svg%3E'">
+                <img src="{{ url_for('static', filename='images/ched-logo.png') }}"
+                     alt="CHED"
+                     class="footer-logo"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%2250%22 font-size=%2235%22%3E📚%3C/text%3E%3C/svg%3E'">
+            </div>
+            <div class="decorative-line"></div>
+            <p class="mb-2"><strong>Bicol University Tabaco – Fisheries Department</strong></p>
+            <p class="mb-0"><small>&copy; 2025 All rights reserved. | Digital Thesis Repository</small></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

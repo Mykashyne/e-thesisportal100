@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}{{ thesis.title|striptags }} - E-Thesis Portal{% endblock %}
+
+{% block content %}
+<div class="row mb-3">
+    <div class="col-md-12">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Main Content - Left Side -->
+    <div class="col-lg-8 col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <!-- Title Section -->
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <h2 class="thesis-title mb-0">{{ thesis.title|safe }}</h2>
+                    <span class="badge bg-primary year-badge">{{ thesis.year }}</span>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Author Section -->
+                <div class="info-section mb-4">
+                    <h5 class="section-header">
+                        <i class="fas fa-user"></i> Author(s)
+                    </h5>
+                    <p class="section-content">{{ thesis.authors }}</p>
+                </div>
+
+                <!-- Adviser Section -->
+                <div class="info-section mb-4">
+                    <h5 class="section-header">
+                        <i class="fas fa-user-tie"></i> Adviser
+                    </h5>
+                    <p class="section-content">{{ thesis.adviser }}</p>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Abstract Section -->
+                <div class="info-section mb-4">
+                    <h5 class="section-header">
+                        <i class="fas fa-file-alt"></i> Abstract
+                    </h5>
+                    <div class="section-content abstract-text">
+                        {{ thesis.abstract|safe }}
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Keywords Section -->
+                <div class="info-section">
+                    <h5 class="section-header">
+                        <i class="fas fa-tags"></i> Keywords
+                    </h5>
+                    <div class="keywords-container">
+                        {% for keyword in thesis.keywords.split(',') %}
+                        <span class="keyword-badge">{{ keyword.strip()|safe }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar - Right Side -->
+    <div class="col-lg-4 col-md-5 mt-4 mt-md-0">
+        <!-- Download Section -->
+        <div class="card shadow-sm mb-3">
+            <div class="card-header download-header">
+                <i class="fas fa-download"></i> Download
+            </div>
+            <div class="card-body text-center p-4">
+                {% if thesis.pdf_filename %}
+                <a href="{{ url_for('download_thesis', thesis_id=thesis.id) }}"
+                   class="btn btn-primary btn-lg w-100 download-btn">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </a>
+                <p class="text-muted mt-3 mb-0"><small>Click to download the full thesis document</small></p>
+                {% else %}
+                <div class="alert alert-warning mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> PDF not available for this thesis.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Info Section -->
+        <div class="card shadow-sm">
+            <div class="card-header quick-info-header">
+                <i class="fas fa-info-circle"></i> Quick Info
+            </div>
+            <div class="card-body p-4">
+                <div class="quick-info-item">
+                    <strong>Year:</strong>
+                    <span class="float-end">{{ thesis.year }}</span>
+                </div>
+                <hr>
+                <div class="quick-info-item">
+                    <strong>Department:</strong>
+                    <span class="float-end">Fisheries</span>
+                </div>
+                <hr>
+                <div class="quick-info-item mb-0">
+                    <strong>University:</strong>
+                    <span class="float-end text-end">Bicol University Tabaco</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .thesis-title {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #2c3e50;
+        line-height: 1.4;
+    }
+
+    .year-badge {
+        font-size: 1.1rem;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #0078d4 0%, #50a0d8 100%) !important;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,120,212,0.3);
+    }
+
+    .info-section {
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .section-header {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #495057;
+        margin-bottom: 12px;
+    }
+
+    .section-header i {
+        color: #0078d4;
+        margin-right: 8px;
+    }
+
+    .section-content {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 1rem;
+        color: #333;
+        line-height: 1.7;
+        text-align: justify;
+        margin-bottom: 0;
+    }
+
+    .abstract-text {
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-left: 4px solid #0078d4;
+        border-radius: 5px;
+    }
+
+    .keywords-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .keyword-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        background-color: #6c757d;
+        color: white;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    /* Sidebar Styles */
+    .download-header {
+        background: linear-gradient(135deg, #0066ff 0%, #0078d4 100%);
+        color: white;
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .download-btn {
+        background: linear-gradient(135deg, #0066ff 0%, #0078d4 100%) !important;
+        border: none !important;
+        padding: 12px 20px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        box-shadow: 0 4px 10px rgba(0,102,255,0.3);
+        transition: all 0.3s ease;
+    }
+
+    .download-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0,102,255,0.4);
+    }
+
+    .quick-info-header {
+        background: linear-gradient(135deg, #00bcd4 0%, #00acc1 100%);
+        color: white;
+        font-family: Arial, sans-serif;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .quick-info-item {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 1rem;
+        padding: 8px 0;
+        color: #333;
+    }
+
+    .quick-info-item strong {
+        color: #495057;
+    }
+
+    .card {
+        border: none;
+        border-radius: 10px;
+    }
+
+    .card-header {
+        border-radius: 10px 10px 0 0 !important;
+        border: none;
+    }
+
+    hr {
+        border-top: 2px solid #e9ecef;
+        margin: 1.5rem 0;
+    }
+
+    @media (max-width: 768px) {
+        .thesis-title {
+            font-size: 1.4rem;
+        }
+
+        .year-badge {
+            font-size: 0.9rem;
+            padding: 6px 12px;
+        }
+    }
+</style>
+{% endblock %}

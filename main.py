@@ -1,4 +1,5 @@
 import os
+
 """
 E-Thesis Portal: Bicol University Tabaco - Fisheries Department
 Flask Application with Admin Panel and Public Access
@@ -56,10 +57,12 @@ def get_db_connection():
 
 
 def init_db():
+    """Initialize database with all required tables and columns"""
     conn = get_db_connection()
+    cursor = conn.cursor()
 
-    # Create users table
-    conn.execute('''
+    # Create users table with all required columns
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
@@ -67,8 +70,17 @@ def init_db():
         )
     ''')
 
+    # Check if password column exists (for existing databases)
+    cursor.execute("PRAGMA table_info(users)")
+    columns = [column[1] for column in cursor.fetchall()]
+
+    if 'password' not in columns:
+        print("Adding missing 'password' column to users table...")
+        cursor.execute('ALTER TABLE users ADD COLUMN password TEXT')
+        conn.commit()
+
     # Create theses table
-    conn.execute('''
+    cursor.execute('''
         CREATE TABLE IF NOT EXISTS theses (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
@@ -82,14 +94,17 @@ def init_db():
         )
     ''')
 
-    # Create default admin (username: admin, password: admin123)
+    # Create default admin user (username: admin, password: admin123)
     try:
         hashed_password = generate_password_hash('admin123')
-        conn.execute('INSERT INTO users (username, password) VALUES (?, ?)',
-                     ('admin', hashed_password))
+        cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)',
+                       ('admin', hashed_password))
         conn.commit()
+        print("✓ Default admin user created successfully!")
+        print("  Username: admin")
+        print("  Password: admin123")
     except sqlite3.IntegrityError:
-        pass  # Already exists
+        print("✓ Admin user already exists")
 
     conn.close()
 
@@ -188,6 +203,13 @@ def login():
             else:
                 flash('Invalid username or password.', 'danger')
 
+        except sqlite3.OperationalError as e:
+            if 'no such column' in str(e).lower():
+                flash('Database error: Password column missing. Please contact administrator.', 'danger')
+                print(f"ERROR: {e}")
+                print("Run the database fix script to add missing columns.")
+            else:
+                flash(f'Database error: {str(e)}', 'danger')
         except Exception as e:
             flash(f'An error occurred: {str(e)}', 'danger')
 
@@ -324,9 +346,13 @@ if __name__ == '__main__':
     print("E-Thesis Portal - Bicol University Tabaco")
     print("Fisheries Department")
     print("=" * 60)
+    print("\nInitializing database...")
 
     init_db()
 
+    print("\n" + "=" * 60)
+    print("Server starting...")
+    print("=" * 60)
+
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-
